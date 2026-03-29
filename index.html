@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>受験スケジュールナビ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;600;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #F8FAF8;
+  --bg-card: #FFFFFF;
+  --bg-hover: #F2F7F2;
+  --text-primary: #1A2E1A;
+  --text-secondary: #4A5E4A;
+  --text-tertiary: #7A8E7A;
+  --border: #D6E4D6;
+  --border-light: #E8F0E8;
+  --accent: #1B8C5A;
+  --accent-light: #E8F5EE;
+  --accent-dark: #14704A;
+  --green: #0F7B4A;
+  --green-light: #E6F5ED;
+  --amber: #B8860B;
+  --amber-light: #FDF8EB;
+  --red: #C0392B;
+  --red-light: #FDECEC;
+  --purple: #5B7A3A;
+  --purple-light: #F0F5EB;
+  --coral: #C2652A;
+  --coral-light: #FDF2EB;
+  --shadow-sm: 0 1px 3px rgba(20,60,30,0.05);
+  --shadow-md: 0 4px 12px rgba(20,60,30,0.07);
+  --shadow-lg: 0 8px 30px rgba(20,60,30,0.10);
+  --radius: 12px;
+  --radius-sm: 8px;
+  --radius-xs: 6px;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Zen Kaku Gothic New','Noto Sans JP',sans-serif; background:var(--bg); color:var(--text-primary); line-height:1.6; -webkit-font-smoothing:antialiased; }
+
+.header { background:#FFFFFF; border-bottom:2px solid var(--accent); padding:0 24px; position:sticky; top:0; z-index:100; }
+.header-inner { max-width:1200px; margin:0 auto; display:flex; align-items:center; justify-content:space-between; height:64px; }
+.logo { display:flex; align-items:center; gap:10px; }
+.logo-icon { width:32px; height:32px; background:var(--accent); border-radius:8px; display:flex; align-items:center; justify-content:center; color:#fff; font-size:16px; font-weight:700; }
+.logo-text { font-size:18px; font-weight:700; letter-spacing:-0.02em; }
+.logo-text span { color:var(--accent); }
+.header-controls { display:flex; align-items:center; gap:12px; }
+.year-select { appearance:none; background:#F2F7F2; border:1px solid var(--border); border-radius:var(--radius-xs); padding:8px 32px 8px 12px; font-size:14px; font-weight:500; font-family:inherit; cursor:pointer; background-image:url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%235C5C5C' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 10px center; }
+
+.tabs { max-width:1200px; margin:0 auto; padding:16px 24px 0; display:flex; gap:4px; }
+.tab { padding:10px 20px; font-size:14px; font-weight:500; color:var(--text-secondary); background:none; border:none; border-bottom:2px solid transparent; cursor:pointer; font-family:inherit; transition:all .2s; border-radius:var(--radius-xs) var(--radius-xs) 0 0; }
+.tab:hover { background:var(--bg-hover); color:var(--text-primary); }
+.tab.active { color:var(--accent); border-bottom-color:var(--accent); font-weight:600; }
+
+.main { max-width:1200px; margin:0 auto; padding:20px 24px 60px; }
+
+.stats-bar { display:flex; gap:12px; margin-bottom:20px; flex-wrap:wrap; }
+.stat-card { flex:1; min-width:140px; background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius-sm); padding:16px; box-shadow:var(--shadow-sm); }
+.stat-label { font-size:12px; color:var(--text-tertiary); font-weight:500; margin-bottom:4px; }
+.stat-value { font-size:28px; font-weight:700; letter-spacing:-0.02em; }
+.stat-value.blue { color:var(--accent); }
+.stat-value.green { color:var(--green); }
+.stat-value.amber { color:var(--coral); }
+
+.filter-bar { display:flex; gap:10px; margin-bottom:20px; flex-wrap:wrap; align-items:center; }
+.search-input { flex:1; min-width:200px; padding:10px 14px 10px 36px; border:1px solid var(--border); border-radius:var(--radius-xs); font-size:14px; font-family:inherit; background:var(--bg-card) url("data:image/svg+xml,%3Csvg width='16' height='16' viewBox='0 0 16 16' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='7' cy='7' r='5.5' stroke='%238A8A8A' stroke-width='1.5'/%3E%3Cpath d='M11 11L14 14' stroke='%238A8A8A' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat 12px center; transition:border-color .2s; }
+.search-input:focus { outline:none; border-color:var(--accent); }
+.filter-select { appearance:none; padding:10px 32px 10px 12px; border:1px solid var(--border); border-radius:var(--radius-xs); font-size:14px; font-family:inherit; background:var(--bg-card) url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%235C5C5C' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 10px center; cursor:pointer; }
+
+.calendar-timeline { background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius); padding:24px; box-shadow:var(--shadow-sm); overflow-x:auto; }
+.timeline-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; }
+.timeline-title { font-size:16px; font-weight:600; }
+.month-nav { display:flex; gap:4px; flex-wrap:wrap; }
+.month-btn { padding:4px 12px; border:1px solid var(--border); border-radius:var(--radius-xs); background:none; font-size:12px; font-family:inherit; cursor:pointer; color:var(--text-secondary); transition:all .15s; }
+.month-btn:hover,.month-btn.active { background:var(--accent); color:#fff; border-color:var(--accent); }
+.timeline-row { display:grid; grid-template-columns:160px 1fr; align-items:center; min-height:48px; border-bottom:1px solid var(--border-light); }
+.timeline-row:last-child { border-bottom:none; }
+.timeline-school { font-size:13px; font-weight:500; padding-right:12px; }
+.timeline-school small { display:block; font-size:11px; color:var(--text-tertiary); font-weight:400; }
+.timeline-bars { position:relative; height:36px; }
+.timeline-bar { position:absolute; height:24px; border-radius:4px; font-size:10px; font-weight:500; display:flex; align-items:center; padding:0 6px; color:#fff; white-space:nowrap; overflow:hidden; cursor:pointer; transition:transform .15s,box-shadow .15s; top:6px; }
+.timeline-bar:hover { transform:scaleY(1.2); box-shadow:var(--shadow-md); z-index:2; }
+.bar-app { background:var(--accent); }
+.bar-exam { background:var(--coral); }
+.bar-result { background:#3AAF6F; }
+.day-labels { display:grid; grid-template-columns:160px 1fr; margin-bottom:4px; }
+.day-labels-row { display:flex; justify-content:space-between; font-size:11px; color:var(--text-tertiary); }
+.legend { display:flex; gap:16px; font-size:12px; color:var(--text-secondary); margin-top:12px; }
+.legend-item { display:flex; align-items:center; gap:6px; }
+.legend-dot { width:10px; height:10px; border-radius:3px; }
+
+.list-section { display:none; }
+.school-card { background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius); padding:20px 24px; margin-bottom:12px; box-shadow:var(--shadow-sm); transition:box-shadow .2s; cursor:pointer; }
+.school-card:hover { box-shadow:var(--shadow-md); }
+.card-header { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:12px; }
+.card-school-name { font-size:17px; font-weight:600; }
+.card-badges { display:flex; gap:6px; flex-wrap:wrap; }
+.badge { display:inline-flex; align-items:center; padding:3px 10px; border-radius:20px; font-size:11px; font-weight:600; }
+.badge-blue { background:var(--accent-light); color:var(--accent); }
+.badge-green { background:var(--green-light); color:var(--green); }
+.badge-amber { background:var(--amber-light); color:var(--amber); }
+.card-meta { display:flex; gap:16px; font-size:13px; color:var(--text-secondary); margin-bottom:14px; flex-wrap:wrap; }
+.card-schedule { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:10px; }
+.schedule-item { padding:10px 14px; border-radius:var(--radius-xs); border-left:3px solid; }
+.schedule-item.app { background:var(--accent-light); border-color:var(--accent); }
+.schedule-item.exam { background:var(--coral-light); border-color:var(--coral); }
+.schedule-item.result { background:#E2F5EA; border-color:#3AAF6F; }
+.schedule-label { font-size:11px; font-weight:600; color:var(--text-tertiary); margin-bottom:2px; }
+.schedule-date { font-size:14px; font-weight:600; }
+.schedule-detail { font-size:12px; color:var(--text-secondary); margin-top:2px; }
+
+.compare-section { display:none; }
+.compare-table-wrap { background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius); box-shadow:var(--shadow-sm); overflow-x:auto; }
+.compare-table { width:100%; border-collapse:collapse; font-size:13px; }
+.compare-table th { background:var(--bg); padding:12px 16px; text-align:left; font-weight:600; font-size:12px; color:var(--text-secondary); border-bottom:1px solid var(--border); white-space:nowrap; }
+.compare-table td { padding:12px 16px; border-bottom:1px solid var(--border-light); vertical-align:top; }
+.compare-table tr:hover td { background:var(--bg-hover); }
+.compare-table .school-name-cell { font-weight:600; white-space:nowrap; }
+.exam-content-tag { display:inline-block; padding:2px 8px; background:var(--bg); border:1px solid var(--border); border-radius:4px; font-size:11px; margin:1px 2px; white-space:nowrap; }
+
+.modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.4); z-index:200; align-items:center; justify-content:center; padding:24px; }
+.modal-overlay.open { display:flex; }
+.modal { background:var(--bg-card); border-radius:var(--radius); max-width:640px; width:100%; max-height:80vh; overflow-y:auto; box-shadow:var(--shadow-lg); }
+.modal-header { padding:20px 24px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
+.modal-title { font-size:18px; font-weight:700; }
+.modal-close { width:32px; height:32px; border:none; background:var(--bg); border-radius:50%; cursor:pointer; font-size:18px; display:flex; align-items:center; justify-content:center; color:var(--text-secondary); }
+.modal-body { padding:24px; }
+.modal-section { margin-bottom:20px; }
+.modal-section-title { font-size:13px; font-weight:600; color:var(--text-tertiary); margin-bottom:8px; text-transform:uppercase; letter-spacing:0.05em; }
+.modal-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.modal-field-label { font-size:11px; color:var(--text-tertiary); font-weight:500; }
+.modal-field-value { font-size:14px; font-weight:500; margin-top:2px; }
+
+.footer { text-align:center; padding:32px 24px; font-size:12px; color:var(--text-tertiary); border-top:1px solid var(--border); max-width:1200px; margin:0 auto; }
+
+@media (max-width:768px) {
+  .header-inner { height:56px; }
+  .logo-text { font-size:15px; }
+  .tabs { padding:12px 16px 0; overflow-x:auto; }
+  .tab { padding:8px 14px; font-size:13px; white-space:nowrap; }
+  .main { padding:16px 16px 40px; }
+  .stats-bar { gap:8px; }
+  .stat-card { padding:12px; min-width:100px; }
+  .stat-value { font-size:22px; }
+  .filter-bar { flex-direction:column; }
+  .card-schedule { grid-template-columns:1fr; }
+  .modal-grid { grid-template-columns:1fr; }
+  .timeline-row { grid-template-columns:110px 1fr; }
+}
+</style>
+</head>
+<body>
+<header class="header">
+  <div class="header-inner">
+    <div class="logo">
+      <div class="logo-icon">N</div>
+      <div class="logo-text">受験スケジュール<span>ナビ</span></div>
+    </div>
+    <div class="header-controls">
+      <select class="year-select" id="yearSelect">
+        <option value="2026" selected>2026年度入試</option>
+        <option value="2025">2025年度入試（過去）</option>
+      </select>
+    </div>
+  </div>
+</header>
+<div class="tabs">
+  <button class="tab active" onclick="switchTab('calendar',this)">カレンダー</button>
+  <button class="tab" onclick="switchTab('list',this)">一覧・検索</button>
+  <button class="tab" onclick="switchTab('compare',this)">比較表</button>
+</div>
+<div class="main">
+  <div class="stats-bar">
+    <div class="stat-card"><div class="stat-label">登録校数</div><div class="stat-value blue" id="statSchools">10</div></div>
+    <div class="stat-card"><div class="stat-label">入試区分数</div><div class="stat-value green" id="statEntries">18</div></div>
+    <div class="stat-card"><div class="stat-label">今月の試験</div><div class="stat-value amber" id="statExams">—</div></div>
+  </div>
+
+  <div class="calendar-section" id="calendarView">
+    <div class="filter-bar">
+      <input class="search-input" type="text" placeholder="学校名で検索..." id="calSearch" oninput="render()">
+      <select class="filter-select" id="calType" onchange="render()">
+        <option value="">入試区分：すべて</option>
+        <option value="総合型選抜">総合型選抜</option>
+        <option value="学校推薦型選抜">学校推薦型選抜</option>
+        <option value="一般選抜">一般選抜</option>
+      </select>
+    </div>
+    <div class="calendar-timeline">
+      <div class="timeline-header">
+        <div class="timeline-title">受験スケジュール タイムライン</div>
+        <div class="month-nav" id="monthNav"></div>
+      </div>
+      <div id="timelineContent"></div>
+    </div>
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot" style="background:var(--accent)"></div>出願期間</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--coral)"></div>試験日</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#3AAF6F"></div>合格発表</div>
+    </div>
+  </div>
+
+  <div class="list-section" id="listView">
+    <div class="filter-bar">
+      <input class="search-input" type="text" placeholder="学校名・学部で検索..." id="listSearch" oninput="render()">
+      <select class="filter-select" id="listType" onchange="render()">
+        <option value="">入試区分：すべて</option>
+        <option value="総合型選抜">総合型選抜</option>
+        <option value="学校推薦型選抜">学校推薦型選抜</option>
+        <option value="一般選抜">一般選抜</option>
+      </select>
+    </div>
+    <div id="listContent"></div>
+  </div>
+
+  <div class="compare-section" id="compareView">
+    <div class="filter-bar">
+      <select class="filter-select" id="cmpType" onchange="render()">
+        <option value="">入試区分：すべて</option>
+        <option value="総合型選抜">総合型選抜</option>
+        <option value="学校推薦型選抜">学校推薦型選抜</option>
+        <option value="一般選抜">一般選抜</option>
+      </select>
+    </div>
+    <div class="compare-table-wrap"><table class="compare-table" id="cmpTable"></table></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="mTitle"></div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body" id="mBody"></div>
+  </div>
+</div>
+
+<div class="footer">※ 掲載情報は各大学の公式発表に基づいていますが、最新情報は必ず各大学の募集要項でご確認ください。<br>© 2026 受験スケジュールナビ</div>
+
+<script>
+const SHEET_ID='1Z6tYsu-Goi8SD_ea8bnjBCjQaMYmS7WAkprwtaXE2LE';
+const SHEETS={'2026':{gid:'726532453'}};
+let D=[], curTab='calendar', curMonth=new Date(2025,9,1);
+
+function csvUrl(gid){return`https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${gid}`}
+
+function parseCSV(text){
+  const lines=[];let cur='',inQ=false;
+  for(let i=0;i<text.length;i++){
+    const c=text[i];
+    if(c==='"'){inQ=!inQ}
+    else if(c==='\n'&&!inQ){lines.push(cur);cur=''}
+    else{cur+=c}
+  }
+  if(cur)lines.push(cur);
+  return lines.map(line=>{
+    const cols=[];let field='',q=false;
+    for(let i=0;i<line.length;i++){
+      const c=line[i];
+      if(c==='"'){q=!q}
+      else if(c===','&&!q){cols.push(field.trim());field=''}
+      else{field+=c}
+    }
+    cols.push(field.trim());
+    return cols;
+  });
+}
+
+function parseDate(v){
+  if(!v)return'';
+  const m=v.match(/(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})/);
+  if(m)return`${m[1]}-${m[2].padStart(2,'0')}-${m[3].padStart(2,'0')}`;
+  return'';
+}
+
+async function loadData(year){
+  const cfg=SHEETS[year];
+  if(!cfg)return;
+  document.getElementById('timelineContent').innerHTML='<div style="text-align:center;padding:40px;color:var(--text-tertiary)">データ読み込み中...</div>';
+  try{
+    const res=await fetch(csvUrl(cfg.gid));
+    const text=await res.text();
+    const rows=parseCSV(text);
+    if(rows.length<2)return;
+    D=rows.slice(1).filter(r=>r[0]).map(r=>({
+      s:r[0]||'',k:r[1]||'',dp:r[2]||'',t:r[3]||'',r:r[4]||'—',
+      mt:r[5]||'',a1:parseDate(r[6]),a2:parseDate(r[7]),am:r[8]||'',
+      e1:parseDate(r[9]),e1c:r[10]||'',e2:parseDate(r[11]),e2c:r[12]||'',
+      rd:parseDate(r[13]),u:r[14]||'',n:r[15]||''
+    }));
+    render();
+  }catch(e){
+    document.getElementById('timelineContent').innerHTML='<div style="text-align:center;padding:40px;color:var(--red)">データの読み込みに失敗しました。</div>';
+  }
+}
+
+function fd(d){if(!d)return'—';const dt=new Date(d);return`${dt.getMonth()+1}/${dt.getDate()}`}
+function fdf(d){if(!d)return'未定';const dt=new Date(d);return`${dt.getFullYear()}年${dt.getMonth()+1}月${dt.getDate()}日`}
+
+function switchTab(t,btn){
+  curTab=t;
+  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('calendarView').style.display=t==='calendar'?'block':'none';
+  document.getElementById('listView').style.display=t==='list'?'block':'none';
+  document.getElementById('compareView').style.display=t==='compare'?'block':'none';
+}
+
+function getFiltered(){
+  const sf=curTab==='calendar'?'calSearch':curTab==='list'?'listSearch':'';
+  const tf=curTab==='calendar'?'calType':curTab==='list'?'listType':'cmpType';
+  const sv=sf?document.getElementById(sf).value.toLowerCase():'';
+  const tv=document.getElementById(tf)?.value||'';
+  return D.filter(d=>{
+    if(sv&&!d.s.toLowerCase().includes(sv)&&!(d.dp||'').toLowerCase().includes(sv)&&!(d.mt||'').toLowerCase().includes(sv))return false;
+    if(tv&&d.t!==tv)return false;
+    return true;
+  });
+}
+
+function renderTimeline(data){
+  const c=document.getElementById('timelineContent');
+  const ms=new Date(curMonth.getFullYear(),curMonth.getMonth(),1);
+  const me=new Date(curMonth.getFullYear(),curMonth.getMonth()+1,0);
+  const dim=me.getDate();
+  let h=`<div class="day-labels"><div></div><div class="day-labels-row">`;
+  for(let i=1;i<=dim;i+=Math.max(1,Math.floor(dim/8)))h+=`<span>${ms.getMonth()+1}/${i}</span>`;
+  h+=`</div></div>`;
+  const shown=new Set();
+  data.forEach(d=>{
+    const key=d.s+'|'+d.r+'|'+d.dp;
+    if(shown.has(key))return;
+    shown.add(key);
+    const label=d.dp?d.s+' '+d.dp:d.s;
+    h+=`<div class="timeline-row"><div class="timeline-school">${label}<small>${d.r!=='—'?d.r:''} ${d.mt||''}</small></div><div class="timeline-bars">`;
+    if(d.a1&&d.a2){const s=new Date(d.a1),e=new Date(d.a2);if(s<=me&&e>=ms){const l=s<ms?0:((s.getDate()-1)/dim*100);const r=e>me?100:(e.getDate()/dim*100);const w=Math.max(r-l,3);h+=`<div class="timeline-bar bar-app" style="left:${l}%;width:${w}%" onclick='openM(${D.indexOf(d)})'>${fd(d.a1)}〜${fd(d.a2)}</div>`;}}
+    if(d.e1){const ed=new Date(d.e1);if(ed>=ms&&ed<=me){const p=((ed.getDate()-1)/dim*100);h+=`<div class="timeline-bar bar-exam" style="left:${p}%;width:28px;border-radius:50%;padding:0;justify-content:center" onclick='openM(${D.indexOf(d)})'>試</div>`;}}
+    if(d.rd){const rd=new Date(d.rd);if(rd>=ms&&rd<=me){const p=((rd.getDate()-1)/dim*100);h+=`<div class="timeline-bar bar-result" style="left:${p}%;width:28px;border-radius:50%;padding:0;justify-content:center" onclick='openM(${D.indexOf(d)})'>発</div>`;}}
+    h+=`</div></div>`;
+  });
+  if(!h.includes('timeline-row'))h+='<div style="text-align:center;padding:30px;color:var(--text-tertiary)">この月にはデータがありません</div>';
+  c.innerHTML=h;
+}
+
+function renderList(data){
+  const c=document.getElementById('listContent');
+  const g={};data.forEach(d=>{const key=d.s;if(!g[key])g[key]=[];g[key].push(d)});
+  let h='';
+  Object.entries(g).forEach(([s,es])=>{
+    const f=es[0];
+    h+=`<div class="school-card"><div class="card-header"><div class="card-school-name">${s}</div><div class="card-badges"><span class="badge badge-blue">${f.t}</span><span class="badge badge-amber">${f.k}</span></div></div>`;
+    h+=`<div class="card-meta"><span>${es.length}件</span></div><div class="card-schedule">`;
+    const unique=[];const seen=new Set();
+    es.forEach(e=>{const k=e.r+'|'+e.dp+'|'+e.mt;if(!seen.has(k)){seen.add(k);unique.push(e)}});
+    unique.slice(0,6).forEach(e=>{
+      const rLabel=(e.r!=='—'?e.r+' ':'')+(e.dp?e.dp+' ':'')+(e.mt?'('+e.mt+') ':'');
+      h+=`<div class="schedule-item app" style="cursor:pointer" onclick="openM(${D.indexOf(e)})"><div class="schedule-label">${rLabel}出願</div><div class="schedule-date">${fd(e.a1)} 〜 ${fd(e.a2)}</div></div>`;
+      h+=`<div class="schedule-item exam" style="cursor:pointer" onclick="openM(${D.indexOf(e)})"><div class="schedule-label">${rLabel}試験</div><div class="schedule-date">${fd(e.e1)}</div>`;
+      if(e.e1c)h+=`<div class="schedule-detail">${e.e1c}</div>`;
+      h+=`</div>`;
+      h+=`<div class="schedule-item result" style="cursor:pointer" onclick="openM(${D.indexOf(e)})"><div class="schedule-label">${rLabel}発表</div><div class="schedule-date">${fd(e.rd)}</div></div>`;
+    });
+    if(unique.length>6)h+=`<div style="padding:8px;font-size:12px;color:var(--text-tertiary)">他 ${unique.length-6} 件...</div>`;
+    h+=`</div></div>`;
+  });
+  c.innerHTML=h||'<div style="text-align:center;padding:40px;color:var(--text-tertiary)">該当するデータがありません</div>';
+}
+
+function renderCompare(data){
+  const t=document.getElementById('cmpTable');
+  let h=`<thead><tr><th>学校名</th><th>学部</th><th>区分</th><th>回</th><th>方式</th><th>出願期間</th><th>一次試験</th><th>試験内容</th><th>二次試験</th><th>二次内容</th><th>合格発表</th></tr></thead><tbody>`;
+  data.forEach(d=>{
+    h+=`<tr style="cursor:pointer" onclick="openM(${D.indexOf(d)})">`;
+    h+=`<td class="school-name-cell">${d.s}</td>`;
+    h+=`<td style="font-size:12px">${d.dp||'—'}</td>`;
+    h+=`<td><span class="badge badge-blue" style="font-size:10px">${d.t}</span></td>`;
+    h+=`<td>${d.r}</td>`;
+    h+=`<td style="font-size:12px">${d.mt||'—'}</td>`;
+    h+=`<td>${fd(d.a1)} 〜 ${fd(d.a2)}</td><td>${fd(d.e1)}</td>`;
+    h+=`<td>${(d.e1c||'').split('、').map(c=>`<span class="exam-content-tag">${c}</span>`).join('')}</td>`;
+    h+=`<td>${fd(d.e2)}</td>`;
+    h+=`<td>${(d.e2c||'').split('、').filter(Boolean).map(c=>`<span class="exam-content-tag">${c}</span>`).join('')||'—'}</td>`;
+    h+=`<td>${fd(d.rd)}</td></tr>`;
+  });
+  t.innerHTML=h+`</tbody>`;
+}
+
+function openM(i){
+  const d=D[i];if(!d)return;
+  document.getElementById('mTitle').textContent=d.s+' '+d.t+(d.r!=='—'?' '+d.r:'');
+  let h=`<div class="modal-section"><div class="modal-section-title">学校情報</div><div class="modal-grid">`;
+  h+=`<div><div class="modal-field-label">学校名</div><div class="modal-field-value">${d.s}</div></div>`;
+  h+=`<div><div class="modal-field-label">学校種別</div><div class="modal-field-value">${d.k}</div></div>`;
+  h+=`<div><div class="modal-field-label">学部・学科</div><div class="modal-field-value">${d.dp||'—'}</div></div>`;
+  h+=`<div><div class="modal-field-label">試験方式</div><div class="modal-field-value">${d.mt||'—'}</div></div>`;
+  h+=`</div></div>`;
+  h+=`<div class="modal-section"><div class="modal-section-title">出願日程</div><div class="modal-grid">`;
+  h+=`<div><div class="modal-field-label">出願開始日</div><div class="modal-field-value">${fdf(d.a1)}</div></div>`;
+  h+=`<div><div class="modal-field-label">出願締切日</div><div class="modal-field-value">${fdf(d.a2)}</div></div>`;
+  h+=`<div><div class="modal-field-label">出願方法</div><div class="modal-field-value">${d.am||'—'}</div></div>`;
+  h+=`</div></div>`;
+  h+=`<div class="modal-section"><div class="modal-section-title">試験日程・内容</div><div class="modal-grid">`;
+  h+=`<div><div class="modal-field-label">一次試験日</div><div class="modal-field-value">${fdf(d.e1)}</div></div>`;
+  h+=`<div><div class="modal-field-label">一次試験内容</div><div class="modal-field-value">${d.e1c||'—'}</div></div>`;
+  h+=`<div><div class="modal-field-label">二次試験日</div><div class="modal-field-value">${fdf(d.e2)}</div></div>`;
+  h+=`<div><div class="modal-field-label">二次試験内容</div><div class="modal-field-value">${d.e2c||'—'}</div></div>`;
+  h+=`</div></div>`;
+  h+=`<div class="modal-section"><div class="modal-section-title">合格発表・備考</div><div class="modal-grid">`;
+  h+=`<div><div class="modal-field-label">合格発表日</div><div class="modal-field-value">${fdf(d.rd)}</div></div>`;
+  h+=`</div>`;
+  if(d.n)h+=`<div style="margin-top:10px"><div class="modal-field-label">備考</div><div class="modal-field-value" style="color:var(--red)">${d.n}</div></div>`;
+  if(d.u)h+=`<div style="margin-top:10px"><a href="${d.u}" target="_blank" style="color:var(--accent);font-size:13px">募集要項を確認 →</a></div>`;
+  h+=`</div>`;
+  document.getElementById('mBody').innerHTML=h;
+  document.getElementById('modal').classList.add('open');
+}
+function closeModal(){document.getElementById('modal').classList.remove('open')}
+
+function render(){
+  const f=getFiltered();
+  renderTimeline(f);renderList(f);renderCompare(f);
+  document.getElementById('statSchools').textContent=new Set(D.map(d=>d.s)).size;
+  document.getElementById('statEntries').textContent=D.length;
+}
+
+function renderMonthNav(){
+  const ms=[];
+  for(let m=7;m<=11;m++)ms.push(new Date(2025,m,1));
+  for(let m=0;m<=6;m++)ms.push(new Date(2026,m,1));
+  document.getElementById('monthNav').innerHTML=ms.map(m=>
+    `<button class="month-btn${m.getTime()===curMonth.getTime()?' active':''}" onclick="selMonth(${m.getFullYear()},${m.getMonth()},this)">${m.getFullYear()==2026?'\'26/':''}${m.getMonth()+1}月</button>`
+  ).join('');
+}
+function selMonth(y,m,btn){
+  curMonth=new Date(y,m,1);
+  document.querySelectorAll('.month-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  render();
+}
+
+document.getElementById('yearSelect').addEventListener('change',function(){
+  loadData(this.value);
+});
+
+renderMonthNav();
+loadData('2026');
+</script>
+</body>
+</html>
