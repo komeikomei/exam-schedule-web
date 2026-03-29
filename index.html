@@ -74,18 +74,27 @@ body { font-family:'Zen Kaku Gothic New','Noto Sans JP',sans-serif; background:v
 .month-nav { display:flex; gap:4px; flex-wrap:wrap; }
 .month-btn { padding:4px 12px; border:1px solid var(--border); border-radius:var(--radius-xs); background:none; font-size:12px; font-family:inherit; cursor:pointer; color:var(--text-secondary); transition:all .15s; }
 .month-btn:hover,.month-btn.active { background:var(--accent); color:#fff; border-color:var(--accent); }
-.timeline-row { display:grid; grid-template-columns:160px 1fr; align-items:center; min-height:48px; border-bottom:1px solid var(--border-light); }
-.timeline-row:last-child { border-bottom:none; }
-.timeline-school { font-size:13px; font-weight:500; padding-right:12px; }
-.timeline-school small { display:block; font-size:11px; color:var(--text-tertiary); font-weight:400; }
-.timeline-bars { position:relative; height:36px; }
-.timeline-bar { position:absolute; height:24px; border-radius:4px; font-size:10px; font-weight:500; display:flex; align-items:center; padding:0 6px; color:#fff; white-space:nowrap; overflow:hidden; cursor:pointer; transition:transform .15s,box-shadow .15s; top:6px; }
 .timeline-bar:hover { transform:scaleY(1.2); box-shadow:var(--shadow-md); z-index:2; }
 .bar-app { background:var(--accent); }
 .bar-exam { background:var(--coral); }
 .bar-result { background:#3AAF6F; }
-.day-labels { display:grid; grid-template-columns:160px 1fr; margin-bottom:4px; }
-.day-labels-row { display:flex; justify-content:space-between; font-size:11px; color:var(--text-tertiary); }
+.day-header { display:grid; margin-bottom:0; border-bottom:1px solid var(--border); }
+.day-header-cell { font-size:10px; color:var(--text-tertiary); text-align:center; padding:4px 0; border-right:1px solid var(--border-light); font-weight:500; }
+.day-header-cell.week-start { border-right:1px solid var(--border); font-weight:600; color:var(--text-secondary); }
+.day-header-cell.today { background:var(--red-light); color:var(--red); font-weight:700; }
+.timeline-grid-row { display:grid; align-items:center; min-height:44px; border-bottom:1px solid var(--border-light); }
+.timeline-grid-row:nth-child(even) { background:rgba(0,0,0,0.01); }
+.timeline-grid-row:hover { background:var(--bg-hover); }
+.timeline-school-cell { font-size:12px; font-weight:500; padding:4px 8px 4px 4px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; border-right:2px solid var(--border); }
+.timeline-school-cell small { display:block; font-size:10px; color:var(--text-tertiary); font-weight:400; }
+.timeline-day-cell { position:relative; height:100%; border-right:1px solid var(--border-light); min-height:44px; }
+.timeline-day-cell.week-start { border-right:1px solid var(--border); }
+.timeline-day-cell.today { background:rgba(192,57,43,0.06); }
+.timeline-day-cell.today::before { content:''; position:absolute; top:0; bottom:0; left:50%; width:2px; background:var(--red); opacity:0.5; transform:translateX(-50%); }
+.tl-bar { position:absolute; height:20px; top:50%; transform:translateY(-50%); border-radius:3px; font-size:9px; font-weight:600; display:flex; align-items:center; padding:0 4px; color:#fff; white-space:nowrap; overflow:hidden; cursor:pointer; z-index:1; transition:transform .15s,box-shadow .15s; }
+.tl-bar:hover { transform:translateY(-50%) scaleY(1.3); box-shadow:var(--shadow-md); z-index:3; }
+.tl-dot { position:absolute; width:22px; height:22px; top:50%; transform:translate(-50%,-50%); border-radius:50%; font-size:9px; font-weight:700; display:flex; align-items:center; justify-content:center; color:#fff; cursor:pointer; z-index:2; transition:transform .15s; }
+.tl-dot:hover { transform:translate(-50%,-50%) scale(1.3); z-index:3; }
 .legend { display:flex; gap:16px; font-size:12px; color:var(--text-secondary); margin-top:12px; }
 .legend-item { display:flex; align-items:center; gap:6px; }
 .legend-dot { width:10px; height:10px; border-radius:3px; }
@@ -322,22 +331,82 @@ function renderTimeline(data){
   const ms=new Date(curMonth.getFullYear(),curMonth.getMonth(),1);
   const me=new Date(curMonth.getFullYear(),curMonth.getMonth()+1,0);
   const dim=me.getDate();
-  let h=`<div class="day-labels"><div></div><div class="day-labels-row">`;
-  for(let i=1;i<=dim;i+=Math.max(1,Math.floor(dim/8)))h+=`<span>${ms.getMonth()+1}/${i}</span>`;
-  h+=`</div></div>`;
+  const today=new Date();today.setHours(0,0,0,0);
+  const colW=140;
+  const gridCols=`${colW}px repeat(${dim},1fr)`;
+
+  // Header row with day numbers
+  let h=`<div class="day-header" style="display:grid;grid-template-columns:${gridCols}">`;
+  h+=`<div class="day-header-cell" style="border-right:2px solid var(--border);font-weight:600;font-size:11px;color:var(--text-primary)">${ms.getMonth()+1}月</div>`;
+  for(let d=1;d<=dim;d++){
+    const dt=new Date(ms.getFullYear(),ms.getMonth(),d);
+    const isToday=dt.getTime()===today.getTime();
+    const isSun=dt.getDay()===0;
+    const isSat=dt.getDay()===6;
+    const isWeekStart=dt.getDay()===1;
+    const cls=['day-header-cell'];
+    if(isWeekStart)cls.push('week-start');
+    if(isToday)cls.push('today');
+    let color='';
+    if(isSun)color='color:var(--red)';
+    else if(isSat)color='color:var(--accent)';
+    h+=`<div class="${cls.join(' ')}" style="${color}">${d}</div>`;
+  }
+  h+=`</div>`;
+
+  // Data rows
   const shown=new Set();
   data.forEach(d=>{
     const key=d.s+'|'+d.r+'|'+d.dp;
     if(shown.has(key))return;
     shown.add(key);
     const label=d.dp?d.s+' '+d.dp:d.s;
-    h+=`<div class="timeline-row"><div class="timeline-school">${label}<small>${d.r!=='—'?d.r:''} ${d.mt||''}</small></div><div class="timeline-bars">`;
-    if(d.a1&&d.a2){const s=new Date(d.a1),e=new Date(d.a2);if(s<=me&&e>=ms){const l=s<ms?0:((s.getDate()-1)/dim*100);const r=e>me?100:(e.getDate()/dim*100);const w=Math.max(r-l,3);h+=`<div class="timeline-bar bar-app" style="left:${l}%;width:${w}%" onclick='openM(${D.indexOf(d)})'>${fd(d.a1)}〜${fd(d.a2)}</div>`;}}
-    if(d.e1){const ed=new Date(d.e1);if(ed>=ms&&ed<=me){const p=((ed.getDate()-1)/dim*100);h+=`<div class="timeline-bar bar-exam" style="left:${p}%;width:28px;border-radius:50%;padding:0;justify-content:center" onclick='openM(${D.indexOf(d)})'>試</div>`;}}
-    if(d.rd){const rd=new Date(d.rd);if(rd>=ms&&rd<=me){const p=((rd.getDate()-1)/dim*100);h+=`<div class="timeline-bar bar-result" style="left:${p}%;width:28px;border-radius:50%;padding:0;justify-content:center" onclick='openM(${D.indexOf(d)})'>発</div>`;}}
-    h+=`</div></div>`;
+    const sub=(d.r!=='—'?d.r:'')+(d.mt?' '+d.mt:'');
+
+    h+=`<div class="timeline-grid-row" style="display:grid;grid-template-columns:${gridCols}">`;
+    h+=`<div class="timeline-school-cell" title="${label}">${label}<small>${sub}</small></div>`;
+
+    // Day cells with bars
+    for(let day=1;day<=dim;day++){
+      const dt=new Date(ms.getFullYear(),ms.getMonth(),day);
+      const isToday=dt.getTime()===today.getTime();
+      const isWeekStart=dt.getDay()===1;
+      const cls=['timeline-day-cell'];
+      if(isWeekStart)cls.push('week-start');
+      if(isToday)cls.push('today');
+
+      let inner='';
+      // App bar (spans multiple cells, only render on start day)
+      if(d.a1&&d.a2){
+        const s=new Date(d.a1),e=new Date(d.a2);
+        const sDay=s<ms?1:s.getDate();
+        const eDay=e>me?dim:e.getDate();
+        if(day===sDay&&s<=me&&e>=ms){
+          const span=eDay-sDay+1;
+          inner+=`<div class="tl-bar" style="background:var(--accent);left:0;right:0;width:calc(${span*100}% + ${(span-1)*0}px)" onclick="openM(${D.indexOf(d)})" title="出願: ${fd(d.a1)}〜${fd(d.a2)}">${fd(d.a1)}〜${fd(d.a2)}</div>`;
+        }
+      }
+      // Exam dot
+      if(d.e1){
+        const ed=new Date(d.e1);
+        if(ed.getMonth()===ms.getMonth()&&ed.getFullYear()===ms.getFullYear()&&ed.getDate()===day){
+          inner+=`<div class="tl-dot" style="background:var(--coral);left:50%" onclick="openM(${D.indexOf(d)})" title="試験: ${fd(d.e1)}">試</div>`;
+        }
+      }
+      // Result dot
+      if(d.rd){
+        const rd=new Date(d.rd);
+        if(rd.getMonth()===ms.getMonth()&&rd.getFullYear()===ms.getFullYear()&&rd.getDate()===day){
+          inner+=`<div class="tl-dot" style="background:#3AAF6F;left:50%" onclick="openM(${D.indexOf(d)})" title="発表: ${fd(d.rd)}">発</div>`;
+        }
+      }
+
+      h+=`<div class="${cls.join(' ')}">${inner}</div>`;
+    }
+    h+=`</div>`;
   });
-  if(!h.includes('timeline-row'))h+='<div style="text-align:center;padding:30px;color:var(--text-tertiary)">この月にはデータがありません</div>';
+
+  if(!h.includes('timeline-grid-row'))h+='<div style="text-align:center;padding:30px;color:var(--text-tertiary)">この月にはデータがありません</div>';
   c.innerHTML=h;
 }
 
