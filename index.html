@@ -37,7 +37,7 @@
   --radius-xs: 6px;
 }
 * { margin:0; padding:0; box-sizing:border-box; }
-body { font-family:'Zen Kaku Gothic New','Noto Sans JP',sans-serif; background:var(--bg); color:var(--text-primary); line-height:1.6; font-size:15px; -webkit-font-smoothing:antialiased; }
+body { font-family:'Noto Sans JP','Zen Kaku Gothic New',sans-serif; background:var(--bg); color:var(--text-primary); line-height:1.6; font-size:15px; -webkit-font-smoothing:antialiased; }
 
 .header { background:#FFFFFF; border-bottom:2px solid var(--accent); padding:0 24px; position:sticky; top:0; z-index:100; }
 .header-inner { max-width:1200px; margin:0 auto; display:flex; align-items:center; justify-content:space-between; height:64px; }
@@ -333,12 +333,12 @@ function renderTimeline(data){
   const me=new Date(curMonth.getFullYear(),curMonth.getMonth()+1,0);
   const dim=me.getDate();
   const today=new Date();today.setHours(0,0,0,0);
-  const colW=140;
-  const gridCols=`${colW}px repeat(${dim},1fr)`;
+  const colW=140;const col2=100;const col2=100;
+  const gridCols=`${colW}px ${col2}px repeat(${dim},1fr)`;
 
   // Header row with day numbers
   let h=`<div class="day-header" style="display:grid;grid-template-columns:${gridCols}">`;
-  h+=`<div class="day-header-cell" style="border-right:2px solid var(--border);font-weight:600;font-size:11px;color:var(--text-primary)">${ms.getMonth()+1}月</div>`;
+  h+=`<div class="day-header-cell" style="border-right:2px solid var(--border);font-weight:600;font-size:11px;color:var(--text-primary)">${ms.getMonth()+1}月</div>`;h+=`<div class="day-header-cell" style="border-right:2px solid var(--border);font-weight:600;font-size:10px;color:var(--text-secondary)">形態</div>`;
   for(let d=1;d<=dim;d++){
     const dt=new Date(ms.getFullYear(),ms.getMonth(),d);
     const isToday=dt.getTime()===today.getTime();
@@ -365,7 +365,7 @@ function renderTimeline(data){
     const sub=(d.r!=='—'?d.r:'')+(d.mt?' '+d.mt:'');
 
     h+=`<div class="timeline-grid-row" style="display:grid;grid-template-columns:${gridCols}">`;
-    h+=`<div class="timeline-school-cell" title="${label}">${label}<small>${sub}</small></div>`;
+    h+=`<div class="timeline-school-cell" title="${label}">${label}</div>`;h+=`<div class="timeline-school-cell" style="font-size:11px;color:var(--text-secondary)" title="${sub}">${sub}</div>`;
 
     // Day cells with bars
     for(let day=1;day<=dim;day++){
