@@ -85,8 +85,8 @@ body { font-family:'Zen Kaku Gothic New','Noto Sans JP',sans-serif; background:v
 .timeline-grid-row { display:grid; align-items:center; min-height:48px; border-bottom:1px solid var(--border-light); }
 .timeline-grid-row:nth-child(even) { background:rgba(0,0,0,0.01); }
 .timeline-grid-row:hover { background:var(--bg-hover); }
-.timeline-school-cell { font-size:13px; font-weight:500; padding:4px 8px 4px 4px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; border-right:2px solid var(--border); }
-.timeline-school-cell small { display:block; font-size:11px; color:var(--text-tertiary); font-weight:400; }
+.timeline-school-cell { font-size:13px; font-weight:500; padding:4px 8px 4px 4px; overflow:hidden; white-space:normal; border-right:2px solid var(--border); line-height:1.3; }
+.timeline-school-cell small { display:block; font-size:13px; color:var(--text-primary); font-weight:500; margin-top:1px; }
 .timeline-type-cell { font-size:12px; font-weight:500; padding:4px 6px; overflow:hidden; text-overflow:ellipsis; white-space:normal; word-break:break-all; border-right:2px solid var(--border); color:var(--text-secondary); line-height:1.3; }
 .timeline-day-cell { position:relative; height:100%; border-right:1px solid var(--border-light); min-height:48px; }
 .timeline-day-cell.week-start { border-right:1px solid var(--border); }
@@ -363,11 +363,12 @@ function renderTimeline(data){
     const key=d.s+'|'+d.r+'|'+d.dp;
     if(shown.has(key))return;
     shown.add(key);
-    const label=d.dp?d.s+' '+d.dp:d.s;
+    const label=d.dp?d.s:d.s;
+    const dept=d.dp||'';
     const sub=(d.r!=='—'?d.r:'')+(d.mt?' '+d.mt:'');
 
     h+=`<div class="timeline-grid-row" style="display:grid;grid-template-columns:${gridCols}">`;
-    h+=`<div class="timeline-school-cell" title="${label}">${label}</div>`;
+    h+=`<div class="timeline-school-cell" title="${label} ${dept}">${label}${dept?'<small>'+dept+'</small>':''}</div>`;
     h+=`<div class="timeline-type-cell" title="${sub}">${sub}</div>`;
 
     // Day cells with bars
