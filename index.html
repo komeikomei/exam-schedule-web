@@ -177,7 +177,7 @@ body { font-family:'Zen Kaku Gothic New','Noto Sans JP',sans-serif; background:v
 </header>
 <div class="tabs">
   <button class="tab active" onclick="switchTab('calendar',this)">カレンダー</button>
-  <button class="tab" onclick="switchTab('list',this)">一覧・検索</button>
+  <button class="tab" onclick="switchTab('list',this)">志望校診断</button>
   <button class="tab" onclick="switchTab('compare',this)">比較表</button>
 </div>
 <div class="main">
@@ -517,9 +517,78 @@ function updateTypeFilter(){
     el.value=v;
   });
 }
+
+const KANTO=['早稲田','慶應','明治','中央','法政','立教','上智','東京','筑波','学習院','日本','東洋','駒澤','専修','明治学院','國學院','東京理科','東京工科','東京成徳','東京有明','東京電機','国士舘','順天堂','文教','大正','桜美林','関東学院','神奈川','ZEN','津田塾','日本女子','帝京','高崎商科','医療創生'];
+const KANSAI=['立命館','同志社','近畿','桃山学院','京都橘'];
+const BUN_DEPT=['法','経済','経営','商','文','社会','国際','政策','人文','教育','外国語','観光','コミュニティ','心理','異文化','福祉','総合政策'];
+const RI_DEPT=['理','工','建築','情報','化学','生命','数学','物理','農','薬','医','看護','環境','生物'];
+
+function matchArea(s,area){
+  if(!area)return true;
+  if(area==='kanto')return KANTO.some(k=>s.includes(k));
+  if(area==='kansai')return KANSAI.some(k=>s.includes(k));
+  return !KANTO.some(k=>s.includes(k))&&!KANSAI.some(k=>s.includes(k));
+}
+function matchBunkei(dp,bk){
+  if(!bk)return true;
+  const d=(dp||'').toLowerCase();
+  if(bk==='bun')return BUN_DEPT.some(k=>d.includes(k));
+  if(bk==='ri')return RI_DEPT.some(k=>d.includes(k));
+  return true;
+}
+function runDiag(){
+  const bk=document.getElementById('dxBunkei')?.value||'';
+  const field=document.getElementById('dxField')?.value||'';
+  const subj=document.getElementById('dxSubject')?.value||'';
+  const essay=document.getElementById('dxEssay')?.value||'';
+  const kyote=document.getElementById('dxKyote')?.value||'';
+  const area=document.getElementById('dxArea')?.value||'';
+  const ip=curMode==='ippan';
+  const results=D.filter(d=>{
+    if(!matchArea(d.s,area))return false;
+    if(!matchBunkei(d.dp,bk))return false;
+    if(field&&!(d.dp||'').includes(field))return false;
+    if(subj){
+      const content=ip?(d.km||''):(d.e1c||'')+(d.e2c||'');
+      if(!content.includes(subj))return false;
+    }
+    if(essay==='yes'){const ct=(d.e1c||'')+(d.e2c||'')+(d.km||'');if(!ct.includes('小論')&&!ct.includes('面接'))return false}
+    if(essay==='no'){const ct=(d.e1c||'')+(d.e2c||'')+(d.km||'');if(ct.includes('小論')||ct.includes('面接'))return false}
+    if(kyote==='dokuj'&&d.kt&&d.kt!=='独自入試')return false;
+    if(kyote==='kyote'&&d.kt&&!d.kt.includes('共通テスト'))return false;
+    return true;
+  });
+  document.getElementById('diagCount').textContent=results.length>0?results.length+'件の入試が見つかりました':'条件に一致する入試がありません。条件を変更してみてください。';
+  renderDiagCards(results);
+}
+function resetDiag(){
+  ['dxBunkei','dxField','dxSubject','dxEssay','dxKyote','dxArea'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=''});
+  runDiag();
+}
+function renderDiagCards(data){
+  const c=document.getElementById('listData');
+  if(!data.length){c.innerHTML='<div style="text-align:center;padding:40px;color:var(--text-tertiary)">条件を選択してください</div>';return}
+  const g={};data.forEach(d=>{const k=d.s;if(!g[k])g[k]=[];g[k].push(d)});
+  let h='';
+  Object.entries(g).forEach(([s,es])=>{
+    h+='<div class="school-card"><div class="card-header"><div class="card-school-name">'+s+'</div><div class="card-badges"><span class="badge badge-blue">'+es.length+'件</span></div></div>';
+    h+='<div class="card-schedule">';
+    const seen=new Set();
+    es.forEach(e=>{
+      const k=(e.dp||'')+'|'+(e.mt||'');
+      if(seen.has(k))return;seen.add(k);
+      h+='<div class="schedule-item app" style="cursor:pointer" onclick="openM('+D.indexOf(e)+')"><div class="schedule-label" style="font-weight:600">'+(e.dp||'')+'</div><div class="schedule-date" style="font-size:12px;color:var(--text-secondary)">'+(e.mt||e.t)+'</div>';
+      if(e.km)h+='<div style="margin-top:4px">'+e.km.split('・').map(function(s){return '<span class="exam-content-tag" style="margin:1px">'+s+'</span>'}).join('')+'</div>';
+      else if(e.e1c)h+='<div style="margin-top:4px">'+e.e1c.split('、').map(function(s){return '<span class="exam-content-tag" style="margin:1px">'+s+'</span>'}).join('')+'</div>';
+      h+='<div style="font-size:11px;color:var(--text-tertiary);margin-top:4px">出願: '+fd(e.a1)+' 〜 '+fd(e.a2)+'　試験: '+fd(e.e1)+'　発表: '+fd(e.rd)+'</div></div>';
+    });
+    h+='</div></div>';
+  });
+  c.innerHTML=h;
+}
 function render(){
   const f=getFiltered();
-  updateTypeFilter();renderTimeline(f);renderList(f);renderCompare(f);
+  updateTypeFilter();renderTimeline(f);if(curTab==="list"){runDiag()}renderCompare(f);
   document.getElementById('statSchools').textContent=new Set(D.map(d=>d.s)).size;
   document.getElementById('statEntries').textContent=D.length;
 }
