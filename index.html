@@ -453,7 +453,7 @@ function renderCompare(data){
     h+=`<td>${(d.e1c||'').split('、').map(c=>`<span class="exam-content-tag">${c}</span>`).join('')}</td>`;
     h+=`<td>${fd(d.e2)}</td>`;
     h+=`<td>${(d.e2c||'').split('、').filter(Boolean).map(c=>`<span class="exam-content-tag">${c}</span>`).join('')||'—'}</td>`;
-    h+=`<td>${fd(d.rd)}</td><td style="font-size:11px">${d.km||"—"}</td><td style="font-size:11px">${d.ht||"—"}</td><td><span class="badge badge-amber" style="font-size:10px">${d.kt||"—"}</span></td></tr>`;
+    h+=`<td>${fd(d.rd)}</td><td>${(d.km||"—").split("・").map(s=>`<span class="exam-content-tag" style="margin:1px;display:inline-block">${s}</span>`).join("")}</td><td>${(d.ht||"—").split("・").map(s=>`<div style="font-size:10px;line-height:1.6">${s}</div>`).join("")}</td><td><span class="badge badge-amber" style="font-size:10px">${d.kt||"—"}</span></td></tr>`;
   });
   t.innerHTML=h+`</tbody>`;
 }
