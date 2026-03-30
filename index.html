@@ -221,7 +221,7 @@ body { font-family:'Zen Kaku Gothic New','Noto Sans JP',sans-serif; background:v
         <option value="一般選抜">一般選抜</option>
       </select>
     </div>
-    <div id="listContent"></div>
+    <div id="listData"></div>
   </div>
 
   <div class="compare-section" id="compareView">
@@ -424,7 +424,7 @@ function renderTimeline(data){
 }
 
 function renderList(data){
-  const c=document.getElementById('listContent');
+  const c=document.getElementById('listData');
   const g={};data.forEach(d=>{const key=d.s;if(!g[key])g[key]=[];g[key].push(d)});
   let h='';
   Object.entries(g).forEach(([s,es])=>{
