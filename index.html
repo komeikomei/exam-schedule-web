@@ -189,7 +189,7 @@ body { font-family:'Zen Kaku Gothic New','Noto Sans JP',sans-serif; background:v
 
   <div class="calendar-section" id="calendarView">
     <div class="filter-bar">
-      <input class="search-input" type="text" placeholder="大学名・学部・試験内容で検索..." id="calSearch" oninput="render()">
+      <div style="display:flex;gap:8px;flex:1;flex-wrap:wrap"><input class="search-input" type="text" placeholder="大学名" id="calSchool" oninput="render()" style="flex:1;min-width:120px"><input class="search-input" type="text" placeholder="学部・学科" id="calDept" oninput="render()" style="flex:1;min-width:120px"><input class="search-input" type="text" placeholder="試験内容・科目" id="calContent" oninput="render()" style="flex:1;min-width:120px"></div>
       <select class="filter-select" id="calType" onchange="render()">
         <option value="">入試区分：すべて</option>
         <option value="総合型選抜">総合型選抜</option>
@@ -213,7 +213,7 @@ body { font-family:'Zen Kaku Gothic New','Noto Sans JP',sans-serif; background:v
 
   <div class="list-section" id="listView">
     <div class="filter-bar">
-      <input class="search-input" type="text" placeholder="大学名・学部・試験内容で検索..." id="listSearch" oninput="render()">
+      <div style="display:flex;gap:8px;flex:1;flex-wrap:wrap"><input class="search-input" type="text" placeholder="大学名" id="listSchool" oninput="render()" style="flex:1;min-width:120px"><input class="search-input" type="text" placeholder="学部・学科" id="listDept" oninput="render()" style="flex:1;min-width:120px"><input class="search-input" type="text" placeholder="試験内容・科目" id="listContent" oninput="render()" style="flex:1;min-width:120px"></div>
       <select class="filter-select" id="listType" onchange="render()">
         <option value="">入試区分：すべて</option>
         <option value="総合型選抜">総合型選抜</option>
@@ -226,7 +226,7 @@ body { font-family:'Zen Kaku Gothic New','Noto Sans JP',sans-serif; background:v
 
   <div class="compare-section" id="compareView">
     <div class="filter-bar">
-      <input class="search-input" type="text" placeholder="大学名・学部・試験内容で検索..." id="cmpSearch" oninput="render()">
+      <div style="display:flex;gap:8px;flex:1;flex-wrap:wrap"><input class="search-input" type="text" placeholder="大学名" id="cmpSchool" oninput="render()" style="flex:1;min-width:120px"><input class="search-input" type="text" placeholder="学部・学科" id="cmpDept" oninput="render()" style="flex:1;min-width:120px"><input class="search-input" type="text" placeholder="試験内容・科目" id="cmpContent" oninput="render()" style="flex:1;min-width:120px"></div>
       <select class="filter-select" id="cmpType" onchange="render()">
         <option value="">入試区分：すべて</option>
         <option value="総合型選抜">総合型選抜</option>
@@ -317,19 +317,21 @@ function switchTab(t,btn){
 }
 
 function getFiltered(){
-  const sf=curTab==='calendar'?'calSearch':curTab==='list'?'listSearch':curTab==='compare'?'cmpSearch':'';
+  const pre=curTab==='calendar'?'cal':curTab==='list'?'list':'cmp';
+  const sv1=(document.getElementById(pre+'School')?.value||'').toLowerCase();
+  const sv2=(document.getElementById(pre+'Dept')?.value||'').toLowerCase();
+  const sv3=(document.getElementById(pre+'Content')?.value||'').toLowerCase();
   const tf=curTab==='calendar'?'calType':curTab==='list'?'listType':'cmpType';
-  const sv=sf?document.getElementById(sf).value.toLowerCase():'';
   const tv=document.getElementById(tf)?.value||'';
   const ip=curMode==='ippan';
   return D.filter(d=>{
-    if(sv){
-      const fields=[d.s,d.dp||'',d.mt||''];
-      if(ip){fields.push(d.km||'',d.sk||'',d.kt||'')}
-      else{fields.push(d.e1c||'',d.e2c||'')}
-      if(!fields.some(f=>f.toLowerCase().includes(sv)))return false;
+    if(sv1&&!d.s.toLowerCase().includes(sv1))return false;
+    if(sv2&&!(d.dp||'').toLowerCase().includes(sv2))return false;
+    if(sv3){
+      if(ip){if(!(d.km||'').toLowerCase().includes(sv3)&&!(d.mt||'').toLowerCase().includes(sv3))return false}
+      else{if(!(d.e1c||'').toLowerCase().includes(sv3)&&!(d.e2c||'').toLowerCase().includes(sv3)&&!(d.mt||'').toLowerCase().includes(sv3))return false}
     }
-    if(tv&&d.t!==tv)return false;
+    if(tv){if(ip){if(d.kt!==tv)return false}else{if(d.t!==tv)return false}}
     return true;
   });
 }
@@ -505,9 +507,19 @@ function openM(i){
 }
 function closeModal(){document.getElementById('modal').classList.remove('open')}
 
+function updateTypeFilter(){
+  const ip=curMode==='ippan';
+  ['calType','listType','cmpType'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(!el)return;
+    const v=el.value;
+    el.innerHTML=ip?'<option value="">共テ区分：すべて</option><option value="独自入試">独自入試</option><option value="共通テスト利用">共通テスト利用</option><option value="共通テスト併用">共通テスト併用</option>':'<option value="">入試区分：すべて</option><option value="総合型選抜">総合型選抜</option><option value="学校推薦型選抜">学校推薦型選抜</option>';
+    el.value=v;
+  });
+}
 function render(){
   const f=getFiltered();
-  renderTimeline(f);renderList(f);renderCompare(f);
+  updateTypeFilter();renderTimeline(f);renderList(f);renderCompare(f);
   document.getElementById('statSchools').textContent=new Set(D.map(d=>d.s)).size;
   document.getElementById('statEntries').textContent=D.length;
 }
