@@ -459,8 +459,9 @@ function renderCompare(data){
       h+=`<td style="font-size:13px;color:var(--accent);font-weight:500">${d.t}</td>`;
       h+=`<td>${d.r}</td>`;
       h+=`<td style="font-size:13px">${d.mt||'—'}</td>`;
-      h+=`<td>${fd(d.a1)} 〜 ${fd(d.a2)}</td><td>${fd(d.e1)}</td>`;
-      h+=`<td>${(d.e1c||'').split('、').map(c=>`<span class="exam-content-tag">${c}</span>`).join('')}</td>`;
+      h+=`<td>${fd(d.a1)} 〜 ${fd(d.a2)}</td>`;
+      h+=`<td>${fd(d.e1)}${d.e2?' / '+fd(d.e2):''}</td>`;
+      h+=`<td>${(d.e1c||'').split('、').map(c=>`<span class="exam-content-tag">${c}</span>`).join('')}${d.e2c?'<br>'+(d.e2c||'').split('、').filter(Boolean).map(c=>`<span class="exam-content-tag">${c}</span>`).join(''):''}</td>`;
       h+=`<td>${fd(d.rd)}</td></tr>`;
     }
   });
