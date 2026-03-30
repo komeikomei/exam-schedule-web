@@ -513,7 +513,7 @@ function updateTypeFilter(){
     const el=document.getElementById(id);
     if(!el)return;
     const v=el.value;
-    el.innerHTML=ip?'<option value="">共テ区分：すべて</option><option value="独自入試">独自入試</option><option value="共通テスト利用">共通テスト利用</option><option value="共通テスト併用">共通テスト併用</option>':'<option value="">入試区分：すべて</option><option value="総合型選抜">総合型選抜</option><option value="学校推薦型選抜">学校推薦型選抜</option>';
+    el.innerHTML=ip?'<option value="">入試方式：すべて</option><option value="独自入試">独自入試</option><option value="共通テスト利用">共通テスト利用</option><option value="共通テスト併用">共通テスト併用</option>':'<option value="">入試区分：すべて</option><option value="総合型選抜">総合型選抜</option><option value="学校推薦型選抜">学校推薦型選抜</option>';
     el.value=v;
   });
 }
