@@ -442,7 +442,7 @@ function renderList(data){
 function renderCompare(data){
   const t=document.getElementById('cmpTable');
   const ip=curMode==='ippan';
-  let h=ip?`<thead><tr><th style="min-width:100px">学校名</th><th style="min-width:80px">学部</th><th style="min-width:80px">方式</th><th style="min-width:100px">出願期間</th><th>試験日</th><th style="min-width:140px">試験科目</th><th style="min-width:120px">配点</th><th>共テ区分</th><th>合格発表</th></tr></thead><tbody>`:`<thead><tr><th style="min-width:100px">学校名</th><th style="min-width:80px">学部</th><th style="min-width:90px">区分</th><th>回</th><th style="min-width:80px">方式</th><th style="min-width:100px">出願期間</th><th>一次試験</th><th style="min-width:120px">試験内容</th><th>二次試験</th><th style="min-width:100px">二次内容</th><th>合格発表</th></tr></thead><tbody>`;
+  let h=ip?`<thead><tr><th style="min-width:100px">学校名</th><th style="min-width:80px">学部</th><th style="min-width:80px">方式</th><th style="min-width:100px">出願期間</th><th>試験日</th><th style="min-width:140px">試験科目</th><th style="min-width:120px">配点</th><th>共テ区分</th><th>合格発表</th></tr></thead><tbody>`:`<thead><tr><th style="min-width:100px">学校名</th><th style="min-width:80px">学部</th><th style="min-width:90px">区分</th><th>回</th><th style="min-width:80px">方式</th><th style="min-width:100px">出願期間</th><th>一次試験</th><th style="min-width:120px">試験内容</th><th>合格発表</th></tr></thead><tbody>`;
   data.forEach(d=>{
     h+=`<tr style="cursor:pointer" onclick="openM(${D.indexOf(d)})">`;
     h+=`<td class="school-name-cell">${d.s}</td>`;
@@ -461,8 +461,6 @@ function renderCompare(data){
       h+=`<td style="font-size:13px">${d.mt||'—'}</td>`;
       h+=`<td>${fd(d.a1)} 〜 ${fd(d.a2)}</td><td>${fd(d.e1)}</td>`;
       h+=`<td>${(d.e1c||'').split('、').map(c=>`<span class="exam-content-tag">${c}</span>`).join('')}</td>`;
-      h+=`<td>${fd(d.e2)}</td>`;
-      h+=`<td>${(d.e2c||'').split('、').filter(Boolean).map(c=>`<span class="exam-content-tag">${c}</span>`).join('')||'—'}</td>`;
       h+=`<td>${fd(d.rd)}</td></tr>`;
     }
   });
