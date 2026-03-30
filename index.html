@@ -296,7 +296,7 @@ async function loadData(year){
       s:r[0]||'',k:r[1]||'',dp:r[2]||'',t:r[3]||'',r:r[4]||'—',
       mt:r[5]||'',a1:parseDate(r[6]),a2:parseDate(r[7]),am:r[8]||'',
       e1:parseDate(r[9]),e1c:r[10]||'',e2:parseDate(r[11]),e2c:r[12]||'',
-      rd:parseDate(r[13]),u:r[14]||'',n:r[15]||''
+      rd:parseDate(r[13]),u:r[14]||'',n:r[15]||'',km:r[16]||'',sk:r[17]||'',ht:r[18]||'',kt:r[19]||'',st:r[20]||'',br:r[21]||''
     }));
     render();
   }catch(e){
@@ -481,7 +481,7 @@ function openM(i){
   h+=`<div class="modal-section"><div class="modal-section-title">合格発表・備考</div><div class="modal-grid">`;
   h+=`<div><div class="modal-field-label">合格発表日</div><div class="modal-field-value">${fdf(d.rd)}</div></div>`;
   h+=`</div>`;
-  if(d.n)h+=`<div style="margin-top:10px"><div class="modal-field-label">備考</div><div class="modal-field-value" style="color:var(--red)">${d.n}</div></div>`;
+  if(d.km)h+=`<div class="modal-section"><div class="modal-section-title">試験科目・配点</div><div class="modal-grid"><div><div class="modal-field-label">試験科目</div><div class="modal-field-value">${d.km}</div></div><div><div class="modal-field-label">科目選択方式</div><div class="modal-field-value">${d.sk||"—"}</div></div><div><div class="modal-field-label">配点</div><div class="modal-field-value">${d.ht||"—"}</div></div><div><div class="modal-field-label">共テ区分</div><div class="modal-field-value">${d.kt||"—"}</div></div><div><div class="modal-field-label">合格最低点</div><div class="modal-field-value">${d.st||"—"}</div></div><div><div class="modal-field-label">倍率</div><div class="modal-field-value">${d.br||"—"}</div></div></div></div>`;if(d.n)h+=`<div style="margin-top:10px"><div class="modal-field-label">備考</div><div class="modal-field-value" style="color:var(--red)">${d.n}</div></div>`;
   if(d.u)h+=`<div style="margin-top:10px"><a href="${d.u}" target="_blank" style="color:var(--accent);font-size:13px">募集要項を確認 →</a></div>`;
   h+=`</div>`;
   document.getElementById('mBody').innerHTML=h;
