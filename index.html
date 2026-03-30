@@ -252,7 +252,7 @@ body { font-family:'Zen Kaku Gothic New','Noto Sans JP',sans-serif; background:v
 
 <script>
 const SHEETS={'2026':{suisen:'https://docs.google.com/spreadsheets/d/e/2PACX-1vTi5SLOROmd0N_qgtSqSA8YQ5Wlfmu4XJ80_qrj5kXuzwejz4tqb_YQqIQFCrArGyyHw52wypCJBPtA/pub?gid=40881200&single=true&output=csv',ippan:'https://docs.google.com/spreadsheets/d/e/2PACX-1vTi5SLOROmd0N_qgtSqSA8YQ5Wlfmu4XJ80_qrj5kXuzwejz4tqb_YQqIQFCrArGyyHw52wypCJBPtA/pub?gid=114815342&single=true&output=csv'}};
-let D=[], curTab='calendar', curMonth=new Date(2025,9,1), curMode='suisen';
+let D=[], allD=[], curTab='calendar', curMonth=new Date(2025,9,1), curMode='suisen';
 
 function parseCSV(text){
   const lines=[];let cur='',inQ=false;
@@ -312,6 +312,7 @@ function switchTab(t,btn){
   document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
   document.getElementById('calendarView').style.display=t==='calendar'?'block':'none';
+  document.querySelectorAll('.mode-btn').forEach(b=>b.style.display=t==='list'?'none':'inline-block');
   document.getElementById('listView').style.display=t==='list'?'block':'none';
   document.getElementById('compareView').style.display=t==='compare'?'block':'none';
 }
@@ -476,6 +477,25 @@ function renderCompare(data){
   t.innerHTML=h+`</tbody>`;
 }
 
+function openDiagM(i){
+  const d=allD[i];if(!d)return;
+  document.getElementById('mTitle').textContent=d.s+' '+d.t+(d.r!=='\u2014'?' '+d.r:'');
+  let h='<div style="margin-bottom:8px"><span class="badge '+(d.src==='suisen'?'badge-blue':'badge-amber')+'" style="font-size:12px">'+(d.src==='suisen'?'\u63a8\u85a6':'\u4e00\u822c')+'</span></div>';
+  h+='<div class="modal-section"><div class="modal-section-title">\u5b66\u6821\u60c5\u5831</div><div class="modal-grid">';
+  h+='<div><div class="modal-field-label">\u5b66\u6821\u540d</div><div class="modal-field-value">'+d.s+'</div></div>';
+  h+='<div><div class="modal-field-label">\u5b66\u90e8\u30fb\u5b66\u79d1</div><div class="modal-field-value">'+(d.dp||'\u2014')+'</div></div>';
+  h+='<div><div class="modal-field-label">\u8a66\u9a13\u65b9\u5f0f</div><div class="modal-field-value">'+(d.mt||'\u2014')+'</div></div>';
+  h+='</div></div>';
+  h+='<div class="modal-section"><div class="modal-section-title">\u65e5\u7a0b</div><div class="modal-grid">';
+  h+='<div><div class="modal-field-label">\u51fa\u9858\u671f\u9593</div><div class="modal-field-value">'+fdf(d.a1)+' \u301c '+fdf(d.a2)+'</div></div>';
+  h+='<div><div class="modal-field-label">\u8a66\u9a13\u65e5</div><div class="modal-field-value">'+fdf(d.e1)+'</div></div>';
+  h+='<div><div class="modal-field-label">\u5408\u683c\u767a\u8868</div><div class="modal-field-value">'+fdf(d.rd)+'</div></div>';
+  h+='</div></div>';
+  if(d.e1c||d.km){h+='<div class="modal-section"><div class="modal-section-title">\u8a66\u9a13\u5185\u5bb9</div><div class="modal-field-value">'+(d.km||d.e1c||'\u2014')+'</div></div>'}
+  if(d.u)h+='<div style="margin-top:10px"><a href="'+d.u+'" target="_blank" style="color:var(--accent);font-size:13px">\u52df\u96c6\u8981\u9805\u3092\u78ba\u8a8d \u2192</a></div>';
+  document.getElementById('mBody').innerHTML=h;
+  document.getElementById('modal').classList.add('open');
+}
 function openM(i){
   const d=D[i];if(!d)return;
   document.getElementById('mTitle').textContent=d.s+' '+d.t+(d.r!=='—'?' '+d.r:'');
@@ -544,7 +564,7 @@ function runDiag(){
   const kyote=document.getElementById('dxKyote')?.value||'';
   const area=document.getElementById('dxArea')?.value||'';
   const ip=curMode==='ippan';
-  const results=D.filter(d=>{
+  const results=allD.filter(d=>{
     if(!matchArea(d.s,area))return false;
     if(!matchBunkei(d.dp,bk))return false;
     if(field&&!(d.dp||'').includes(field))return false;
@@ -577,7 +597,7 @@ function renderDiagCards(data){
     es.forEach(e=>{
       const k=(e.dp||'')+'|'+(e.mt||'');
       if(seen.has(k))return;seen.add(k);
-      h+='<div class="schedule-item app" style="cursor:pointer" onclick="openM('+D.indexOf(e)+')"><div class="schedule-label" style="font-weight:600">'+(e.dp||'')+'</div><div class="schedule-date" style="font-size:12px;color:var(--text-secondary)">'+(e.mt||e.t)+'</div>';
+      h+='<div class="schedule-item app" style="cursor:pointer" onclick="openDiagM('+allD.indexOf(e)+')"><div class="schedule-label" style="font-weight:600">'+(e.dp||'')+'</div><div class="schedule-date" style="font-size:12px;color:var(--text-secondary)">'+(e.mt||e.t)+'</div>';
       if(e.km)h+='<div style="margin-top:4px">'+e.km.split('・').map(function(s){return '<span class="exam-content-tag" style="margin:1px">'+s+'</span>'}).join('')+'</div>';
       else if(e.e1c)h+='<div style="margin-top:4px">'+e.e1c.split('、').map(function(s){return '<span class="exam-content-tag" style="margin:1px">'+s+'</span>'}).join('')+'</div>';
       h+='<div style="font-size:11px;color:var(--text-tertiary);margin-top:4px">出願: '+fd(e.a1)+' 〜 '+fd(e.a2)+'　試験: '+fd(e.e1)+'　発表: '+fd(e.rd)+'</div></div>';
@@ -608,6 +628,17 @@ function selMonth(y,m,btn){
   render();
 }
 
+async function loadAllData(year){
+  const cfg=SHEETS[year];if(!cfg)return;
+  try{
+    const [r1,r2]=await Promise.all([fetch(cfg.suisen),fetch(cfg.ippan)]);
+    const [t1,t2]=await Promise.all([r1.text(),r2.text()]);
+    const rows1=parseCSV(t1),rows2=parseCSV(t2);
+    const map1=rows1.slice(1).filter(r=>r[0]).map(r=>({s:r[0]||'',k:r[1]||'',dp:r[2]||'',t:r[3]||'',r:r[4]||'\u2014',mt:r[5]||'',a1:parseDate(r[6]),a2:parseDate(r[7]),am:r[8]||'',e1:parseDate(r[9]),e1c:r[10]||'',e2:parseDate(r[11]),e2c:r[12]||'',rd:parseDate(r[13]),u:r[14]||'',n:r[15]||'',km:r[16]||'',sk:r[17]||'',ht:r[18]||'',kt:r[19]||'',st:r[20]||'',br:r[21]||'',src:'suisen'}));
+    const map2=rows2.slice(1).filter(r=>r[0]).map(r=>({s:r[0]||'',k:r[1]||'',dp:r[2]||'',t:r[3]||'',r:r[4]||'\u2014',mt:r[5]||'',a1:parseDate(r[6]),a2:parseDate(r[7]),am:r[8]||'',e1:parseDate(r[9]),e1c:r[10]||'',e2:parseDate(r[11]),e2c:r[12]||'',rd:parseDate(r[13]),u:r[14]||'',n:r[15]||'',km:r[16]||'',sk:r[17]||'',ht:r[18]||'',kt:r[19]||'',st:r[20]||'',br:r[21]||'',src:'ippan'}));
+    allD=map1.concat(map2);
+  }catch(e){allD=[]}
+}
 function switchMode(m,btn){curMode=m;document.querySelectorAll(".mode-btn").forEach(b=>{b.style.background=b===btn?"var(--accent)":"white";b.style.color=b===btn?"white":"var(--accent)"});loadData(document.getElementById("yearSelect").value)}
 document.getElementById('yearSelect').addEventListener('change',function(){
   loadData(this.value);
@@ -615,6 +646,7 @@ document.getElementById('yearSelect').addEventListener('change',function(){
 
 renderMonthNav();
 loadData('2026');
+loadAllData('2026');
 </script>
 </body>
 </html>
