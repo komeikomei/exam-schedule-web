@@ -211,16 +211,20 @@ body { font-family:'Zen Kaku Gothic New','Noto Sans JP',sans-serif; background:v
     </div>
   </div>
 
-  <div class="list-section" id="listView">
-    <div class="filter-bar">
-      <div style="display:flex;gap:8px;flex:1;flex-wrap:wrap"><input class="search-input" type="text" placeholder="大学名" id="listSchool" oninput="render()" style="flex:1;min-width:120px"><input class="search-input" type="text" placeholder="学部・学科" id="listDept" oninput="render()" style="flex:1;min-width:120px"><input class="search-input" type="text" placeholder="試験内容・科目" id="listContent" oninput="render()" style="flex:1;min-width:120px"></div>
-      <select class="filter-select" id="listType" onchange="render()">
-        <option value="">入試区分：すべて</option>
-        <option value="総合型選抜">総合型選抜</option>
-        <option value="学校推薦型選抜">学校推薦型選抜</option>
-        <option value="一般選抜">一般選抜</option>
-      </select>
+  <div class="list-section" id="listView" style="display:none">
+    <div style="background:white;border-radius:16px;border:1px solid var(--border);padding:24px;margin-bottom:20px">
+      <div style="font-size:18px;font-weight:700;color:var(--text-primary);margin-bottom:16px">あなたに合う入試を探そう</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px">
+        <div><label style="font-size:13px;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:6px">文系 / 理系</label><select class="filter-select" id="dxBunkei" onchange="runDiag()" style="width:100%"><option value="">選択してください</option><option value="bun">文系</option><option value="ri">理系</option><option value="other">どちらでもない</option></select></div>
+        <div><label style="font-size:13px;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:6px">興味のある分野</label><select class="filter-select" id="dxField" onchange="runDiag()" style="width:100%"><option value="">選択してください</option><option value="法">法律・政治</option><option value="経済">経済・経営・商</option><option value="文">文学・人文・教育</option><option value="社会">社会・国際</option><option value="理">理学・数学</option><option value="工">工学・建築・情報</option><option value="農">農学・生命・環境</option><option value="医">医学・看護・薬学</option><option value="芸">芸術・スポーツ</option><option value="総">総合・学際</option></select></div>
+        <div><label style="font-size:13px;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:6px">得意科目</label><select class="filter-select" id="dxSubject" onchange="runDiag()" style="width:100%"><option value="">選択してください</option><option value="英">英語</option><option value="国">国語</option><option value="数">数学</option><option value="理科">理科</option><option value="地歴">地歴・公民</option><option value="小論">小論文が得意</option></select></div>
+        <div><label style="font-size:13px;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:6px">小論文・面接</label><select class="filter-select" id="dxEssay" onchange="runDiag()" style="width:100%"><option value="">こだわらない</option><option value="yes">小論文・面接あり希望</option><option value="no">小論文・面接なし希望</option></select></div>
+        <div><label style="font-size:13px;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:6px">入試方式</label><select class="filter-select" id="dxKyote" onchange="runDiag()" style="width:100%"><option value="">こだわらない</option><option value="dokuj">独自入試のみ</option><option value="kyote">共通テスト利用</option></select></div>
+        <div><label style="font-size:13px;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:6px">地域</label><select class="filter-select" id="dxArea" onchange="runDiag()" style="width:100%"><option value="">こだわらない</option><option value="kanto">関東</option><option value="kansai">関西</option><option value="other">その他</option></select></div>
+      </div>
+      <div style="margin-top:12px;text-align:right"><button onclick="resetDiag()" style="padding:6px 16px;border-radius:8px;border:1px solid var(--border);background:white;color:var(--text-secondary);font-size:13px;cursor:pointer">リセット</button></div>
     </div>
+    <div style="font-size:14px;color:var(--text-secondary);margin-bottom:12px" id="diagCount">条件を選択してください</div>
     <div id="listData"></div>
   </div>
 
@@ -312,6 +316,7 @@ function switchTab(t,btn){
   document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
   document.getElementById('calendarView').style.display=t==='calendar'?'block':'none';
+  document.getElementById('statsBar').style.display=t==='list'?'none':'flex';
   document.querySelectorAll('.mode-btn').forEach(b=>b.style.display=t==='list'?'none':'inline-block');
   document.getElementById('listView').style.display=t==='list'?'block':'none';
   document.getElementById('compareView').style.display=t==='compare'?'block':'none';
