@@ -251,8 +251,8 @@ body { font-family:'Zen Kaku Gothic New','Noto Sans JP',sans-serif; background:v
 <div class="footer">※ 掲載情報は各大学の公式発表に基づいていますが、最新情報は必ず各大学の募集要項でご確認ください。<br>© 2026 受験スケジュールナビ</div>
 
 <script>
-const SHEETS={'2026':{url:'https://docs.google.com/spreadsheets/d/e/2PACX-1vTi5SLOROmd0N_qgtSqSA8YQ5Wlfmu4XJ80_qrj5kXuzwejz4tqb_YQqIQFCrArGyyHw52wypCJBPtA/pub?gid=509597006&single=true&output=csv'}};
-let D=[], curTab='calendar', curMonth=new Date(2025,9,1);
+const SHEETS={'2026':{suisen:'https://docs.google.com/spreadsheets/d/e/2PACX-1vTi5SLOROmd0N_qgtSqSA8YQ5Wlfmu4XJ80_qrj5kXuzwejz4tqb_YQqIQFCrArGyyHw52wypCJBPtA/pub?gid=509597006&single=true&output=csv',ippan:'https://docs.google.com/spreadsheets/d/e/2PACX-1vTi5SLOROmd0N_qgtSqSA8YQ5Wlfmu4XJ80_qrj5kXuzwejz4tqb_YQqIQFCrArGyyHw52wypCJBPtA/pub?gid=454536998&single=true&output=csv'}};
+let D=[], curTab='calendar', curMonth=new Date(2025,9,1), curMode='suisen';
 
 function parseCSV(text){
   const lines=[];let cur='',inQ=false;
@@ -288,7 +288,7 @@ async function loadData(year){
   if(!cfg)return;
   document.getElementById('timelineContent').innerHTML='<div style="text-align:center;padding:40px;color:var(--text-tertiary)">データ読み込み中...</div>';
   try{
-    const res=await fetch(cfg.url);
+    const res=await fetch(cfg[curMode]);
     const text=await res.text();
     const rows=parseCSV(text);
     if(rows.length<2)return;
@@ -511,6 +511,7 @@ function selMonth(y,m,btn){
   render();
 }
 
+function switchMode(m,btn){curMode=m;document.querySelectorAll(".mode-btn").forEach(b=>{b.style.background=b===btn?"var(--accent)":"white";b.style.color=b===btn?"white":"var(--accent)"});loadData(document.getElementById("yearSelect").value)}
 document.getElementById('yearSelect').addEventListener('change',function(){
   loadData(this.value);
 });
