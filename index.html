@@ -189,7 +189,7 @@ body { font-family:'Zen Kaku Gothic New','Noto Sans JP',sans-serif; background:v
 
   <div class="calendar-section" id="calendarView">
     <div class="filter-bar">
-      <input class="search-input" type="text" placeholder="学校名で検索..." id="calSearch" oninput="render()">
+      <input class="search-input" type="text" placeholder="大学名・学部・試験内容で検索..." id="calSearch" oninput="render()">
       <select class="filter-select" id="calType" onchange="render()">
         <option value="">入試区分：すべて</option>
         <option value="総合型選抜">総合型選抜</option>
@@ -213,7 +213,7 @@ body { font-family:'Zen Kaku Gothic New','Noto Sans JP',sans-serif; background:v
 
   <div class="list-section" id="listView">
     <div class="filter-bar">
-      <input class="search-input" type="text" placeholder="学校名・学部で検索..." id="listSearch" oninput="render()">
+      <input class="search-input" type="text" placeholder="大学名・学部・試験内容で検索..." id="listSearch" oninput="render()">
       <select class="filter-select" id="listType" onchange="render()">
         <option value="">入試区分：すべて</option>
         <option value="総合型選抜">総合型選抜</option>
@@ -226,7 +226,7 @@ body { font-family:'Zen Kaku Gothic New','Noto Sans JP',sans-serif; background:v
 
   <div class="compare-section" id="compareView">
     <div class="filter-bar">
-      <input class="search-input" type="text" placeholder="学校名・学部で検索..." id="cmpSearch" oninput="render()">
+      <input class="search-input" type="text" placeholder="大学名・学部・試験内容で検索..." id="cmpSearch" oninput="render()">
       <select class="filter-select" id="cmpType" onchange="render()">
         <option value="">入試区分：すべて</option>
         <option value="総合型選抜">総合型選抜</option>
@@ -321,8 +321,14 @@ function getFiltered(){
   const tf=curTab==='calendar'?'calType':curTab==='list'?'listType':'cmpType';
   const sv=sf?document.getElementById(sf).value.toLowerCase():'';
   const tv=document.getElementById(tf)?.value||'';
+  const ip=curMode==='ippan';
   return D.filter(d=>{
-    if(sv&&!d.s.toLowerCase().includes(sv)&&!(d.dp||'').toLowerCase().includes(sv)&&!(d.mt||'').toLowerCase().includes(sv))return false;
+    if(sv){
+      const fields=[d.s,d.dp||'',d.mt||''];
+      if(ip){fields.push(d.km||'',d.sk||'',d.kt||'')}
+      else{fields.push(d.e1c||'',d.e2c||'')}
+      if(!fields.some(f=>f.toLowerCase().includes(sv)))return false;
+    }
     if(tv&&d.t!==tv)return false;
     return true;
   });
