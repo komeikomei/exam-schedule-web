@@ -169,6 +169,7 @@ body { font-family:'Zen Kaku Gothic New','Noto Sans JP',sans-serif; background:v
     </div>
     <div class="header-controls">
       <select class="year-select" id="yearSelect">
+        <option value="2027">2027年度入試</option>
         <option value="2026" selected>2026年度入試</option>
         <option value="2025">2025年度入試（過去）</option>
       </select>
@@ -177,8 +178,8 @@ body { font-family:'Zen Kaku Gothic New','Noto Sans JP',sans-serif; background:v
 </header>
 <div class="tabs">
   <button class="tab active" onclick="switchTab('calendar',this)">カレンダー</button>
-  <button class="tab" onclick="switchTab('list',this)">志望校診断</button>
   <button class="tab" onclick="switchTab('compare',this)">比較表</button>
+  <button class="tab" onclick="switchTab('list',this)">志望校診断</button>
 </div>
 <div class="main">
   <div class="stats-bar" id="statsBar">
