@@ -382,7 +382,7 @@ function renderTimeline(data){
     const dept=d.dp||'';
     const sub=(d.r!=='—'?d.r:'')+(d.mt?' '+d.mt:'');
 
-    h+=`<div class="timeline-grid-row" style="display:grid;grid-template-columns:${gridCols}">`;
+    h+=`<div class="timeline-grid-row" style="display:grid;grid-template-columns:${gridCols};cursor:pointer" onclick="openM(${D.indexOf(d)})">`;
     h+=`<div class="timeline-school-cell" title="${label} ${dept}">${label}${dept?'<small>'+dept+'</small>':''}</div>`;
     h+=`<div class="timeline-type-cell" title="${sub}">${sub}</div>`;
 
