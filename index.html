@@ -296,7 +296,7 @@ async function loadData(year){
     const res=await fetch(cfg[curMode]);
     const text=await res.text();
     const rows=parseCSV(text);
-    if(rows.length<2)return;
+    if(rows.length<2){D=[];render();return;}
     D=rows.slice(1).filter(r=>r[0]).map(r=>({
       s:r[0]||'',k:r[1]||'',dp:r[2]||'',t:r[3]||'',r:r[4]||'—',
       mt:r[5]||'',a1:parseDate(r[6]),a2:parseDate(r[7]),am:r[8]||'',
@@ -305,7 +305,7 @@ async function loadData(year){
     }));
     render();
   }catch(e){
-    document.getElementById('timelineContent').innerHTML='<div style="text-align:center;padding:40px;color:var(--red)">データの読み込みに失敗しました。</div>';
+    D=[];render();document.getElementById('timelineContent').innerHTML='<div style="text-align:center;padding:40px;color:var(--text-tertiary)">この年度のデータはまだ登録されていません。</div>';
   }
 }
 
@@ -648,6 +648,7 @@ async function loadAllData(year){
 function switchMode(m,btn){curMode=m;document.querySelectorAll(".mode-btn").forEach(b=>{b.style.background=b===btn?"var(--accent)":"white";b.style.color=b===btn?"white":"var(--accent)"});loadData(document.getElementById("yearSelect").value)}
 document.getElementById('yearSelect').addEventListener('change',function(){
   loadData(this.value);
+  loadAllData(this.value);
 });
 
 renderMonthNav();
