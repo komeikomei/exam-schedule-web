@@ -127,7 +127,7 @@ body { font-family:'Zen Kaku Gothic New','Noto Sans JP',sans-serif; background:v
 .compare-table td { padding:12px 16px; border-bottom:1px solid var(--border-light); vertical-align:top; }
 .compare-table tr:hover td { background:var(--bg-hover); }
 .compare-table .school-name-cell { font-weight:600; white-space:nowrap; }
-.exam-content-tag { display:inline-block; padding:3px 10px; background:var(--bg); border:1px solid var(--border); border-radius:4px; font-size:12px; margin:1px 2px; white-space:nowrap; }
+.exam-content-tag { display:inline-block; padding:3px 10px; font-size:12px; background:#f0fdf4; color:#166534; border:1px solid #bbf7d0; border-radius:6px; white-space:nowrap; }
 
 .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.4); z-index:200; align-items:center; justify-content:center; padding:24px; }
 .modal-overlay.open { display:flex; }
@@ -639,8 +639,8 @@ function renderDiagCards(data){
       const k=(e.dp||'')+'|'+(e.mt||'');
       if(seen.has(k))return;seen.add(k);
       h+='<div class="schedule-item app" style="cursor:pointer" onclick="openDiagM('+allD.indexOf(e)+')"><div class="schedule-label" style="font-weight:600">'+(e.dp||'')+'</div><div class="schedule-date" style="font-size:12px;color:var(--text-secondary)">'+(e.mt||e.t)+'</div>';
-      if(e.km)h+='<div style="margin-top:4px">'+e.km.split('・').map(function(s){return '<span class="exam-content-tag" style="margin:1px">'+s+'</span>'}).join('')+'</div>';
-      else if(e.e1c)h+='<div style="margin-top:4px">'+e.e1c.split('、').map(function(s){return '<span class="exam-content-tag" style="margin:1px">'+s+'</span>'}).join('')+'</div>';
+      if(e.km)h+='<div style="margin-top:4px;display:flex;flex-wrap:wrap;gap:4px">'+e.km.split(/[・、\/+,，]/).filter(function(s){return s.trim()}).map(function(s){return '<span class="exam-content-tag">'+s.trim()+'</span>'}).join('')+'</div>';
+      else if(e.e1c)h+='<div style="margin-top:4px;display:flex;flex-wrap:wrap;gap:4px">'+e.e1c.split(/[・、\/+,，]/).filter(function(s){return s.trim()}).map(function(s){return '<span class="exam-content-tag">'+s.trim()+'</span>'}).join('')+'</div>';
       h+='<div style="font-size:11px;color:var(--text-tertiary);margin-top:4px">出願: '+fd(e.a1)+' 〜 '+fd(e.a2)+'　試験: '+fd(e.e1)+'　発表: '+fd(e.rd)+'</div></div>';
     });
     h+='</div></div>';
