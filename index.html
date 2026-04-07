@@ -258,7 +258,7 @@ body { font-family:'Zen Kaku Gothic New','Noto Sans JP',sans-serif; background:v
 
 <div id="links" class="tab-content" style="display:none;max-width:900px;margin:0 auto;padding:0 20px">
       <div class="filter-bar">
-        <input type="text" class="filter-input" id="linkSearch" placeholder="大学名で検索..." oninput="renderLinks()" style="flex:1;min-width:200px">
+        <input type="text" id="linkSearch" placeholder="大学名で検索..." oninput="renderLinks()" style="flex:1;min-width:200px;padding:10px 14px;font-size:16px;border:1px solid var(--border);border-radius:8px;outline:none;box-sizing:border-box">
         <select class="filter-select" id="linkCat" onchange="renderLinks()">
           <option value="">設置区分：すべて</option>
           <option value="国立">国立</option>
