@@ -180,7 +180,7 @@ body { font-family:'Zen Kaku Gothic New','Noto Sans JP',sans-serif; background:v
   <button class="tab active" onclick="switchTab('calendar',this)">カレンダー</button>
   <button class="tab" onclick="switchTab('compare',this)">比較表</button>
   <button class="tab" onclick="switchTab('list',this)">志望校診断</button>
-        <button class="tab-btn" onclick="switchTab('links',this)">入試情報リンク</button>
+        <button class="tab" onclick="switchTab('links',this)">入試情報リンク</button>
 </div>
 <div class="main">
   <div class="stats-bar" id="statsBar">
@@ -256,8 +256,6 @@ body { font-family:'Zen Kaku Gothic New','Noto Sans JP',sans-serif; background:v
   </div>
 </div>
 
-<div class="footer">※ 掲載情報は各大学の公式発表に基づいていますが、最新情報は必ず各大学の募集要項でご確認ください。<br>© 2026 受験スケジュールナビ</div>
-
 <div id="links" class="tab-content" style="display:none">
       <div class="filter-bar">
         <input type="text" class="filter-input" id="linkSearch" placeholder="大学名で検索..." oninput="renderLinks()" style="flex:2">
@@ -272,6 +270,8 @@ body { font-family:'Zen Kaku Gothic New','Noto Sans JP',sans-serif; background:v
       <div id="linkCount" style="padding:8px 0;font-size:13px;color:var(--text-secondary)"></div>
       <div id="linkList"></div>
     </div>
+<div class="footer">※ 掲載情報は各大学の公式発表に基づいていますが、最新情報は必ず各大学の募集要項でご確認ください。<br>© 2026 受験スケジュールナビ</div>
+
 <script>
 const SHEETS={'2027':{suisen:'https://docs.google.com/spreadsheets/d/e/2PACX-1vTi5SLOROmd0N_qgtSqSA8YQ5Wlfmu4XJ80_qrj5kXuzwejz4tqb_YQqIQFCrArGyyHw52wypCJBPtA/pub?gid=1235849952&single=true&output=csv',ippan:'https://docs.google.com/spreadsheets/d/e/2PACX-1vTi5SLOROmd0N_qgtSqSA8YQ5Wlfmu4XJ80_qrj5kXuzwejz4tqb_YQqIQFCrArGyyHw52wypCJBPtA/pub?gid=638922622&single=true&output=csv'},'2026':{suisen:'https://docs.google.com/spreadsheets/d/e/2PACX-1vTi5SLOROmd0N_qgtSqSA8YQ5Wlfmu4XJ80_qrj5kXuzwejz4tqb_YQqIQFCrArGyyHw52wypCJBPtA/pub?gid=931894113&single=true&output=csv',ippan:'https://docs.google.com/spreadsheets/d/e/2PACX-1vTi5SLOROmd0N_qgtSqSA8YQ5Wlfmu4XJ80_qrj5kXuzwejz4tqb_YQqIQFCrArGyyHw52wypCJBPtA/pub?gid=810130631&single=true&output=csv'}};
 let D=[], allD=[], curTab='calendar', curMonth=new Date(2025,9,1), curMode='suisen';
@@ -331,6 +331,8 @@ function fdf(d){if(!d)return'未定';const dt=new Date(d);return`${dt.getFullYea
 
 function switchTab(t,btn){
   curTab=t;
+  document.querySelectorAll('.tab-content').forEach(d=>d.style.display='none');
+  if(t==='links'){document.getElementById('links').style.display='';renderLinks();document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));btn.classList.add('active');return;}
   document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
   document.getElementById('calendarView').style.display=t==='calendar'?'block':'none';
