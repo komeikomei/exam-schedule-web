@@ -101,7 +101,7 @@ body { font-family:'Zen Kaku Gothic New','Noto Sans JP',sans-serif; background:v
 .legend-dot { width:10px; height:10px; border-radius:3px; }
 
 .list-section { display:none; }
-.school-card { background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius); padding:20px 24px; margin-bottom:12px; box-shadow:var(--shadow-sm); transition:box-shadow .2s; cursor:pointer; }
+.school-card { background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius); padding:20px 24px; margin-bottom:12px; box-shadow:var(--shadow-sm); transition:box-shadow .2s; cursor:pointer; overflow:hidden; }
 .school-card:hover { box-shadow:var(--shadow-md); }
 .card-header { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:12px; }
 .card-school-name { font-size:19px; font-weight:600; }
@@ -111,7 +111,7 @@ body { font-family:'Zen Kaku Gothic New','Noto Sans JP',sans-serif; background:v
 .badge-green { background:var(--green-light); color:var(--green); }
 .badge-amber { background:var(--amber-light); color:var(--amber); }
 .card-meta { display:flex; gap:16px; font-size:14px; color:var(--text-secondary); margin-bottom:14px; flex-wrap:wrap; }
-.card-schedule { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:10px; }
+.card-schedule { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:10px; word-break:break-all; overflow-wrap:break-word; }
 .schedule-item { padding:10px 14px; border-radius:var(--radius-xs); border-left:3px solid; }
 .schedule-item.app { background:var(--accent-light); border-color:var(--accent); }
 .schedule-item.exam { background:var(--coral-light); border-color:var(--coral); }
@@ -632,7 +632,7 @@ function renderDiagCards(data){
   const g={};data.forEach(d=>{const k=d.s;if(!g[k])g[k]=[];g[k].push(d)});
   let h='';
   Object.entries(g).forEach(([s,es])=>{
-    h+='<div class="school-card"><div class="card-header"><div class="card-school-name">'+s+'</div>';var uu=getUniUrl(s);if(uu)h+='<a href="'+uu+'" target="_blank" rel="noopener" style="margin-left:8px;padding:4px 10px;font-size:12px;background:var(--accent);color:#fff;border-radius:6px;text-decoration:none;white-space:nowrap">入試情報</a>';h+='<div class="card-badges"><span class="badge badge-blue">'+es.length+'件</span></div></div>';
+    h+='<div class="school-card"><div class="card-header"><div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"><div class="card-school-name">'+s+'</div>';var uu=getUniUrl(s);if(uu)h+='<a href="'+uu+'" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:4px;padding:6px 14px;font-size:13px;font-weight:600;background:var(--accent);color:#fff;border-radius:8px;text-decoration:none;white-space:nowrap;box-shadow:0 2px 4px rgba(27,140,90,.3);transition:opacity .2s" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1"><svg width=\'14\' height=\'14\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'currentColor\' stroke-width=\'2\'><path d=\'M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6\'/><polyline points=\'15 3 21 3 21 9\'/><line x1=\'10\' y1=\'14\' x2=\'21\' y2=\'3\'/></svg>入試情報を見る</a>';h+='</div><div class="card-badges"><span class="badge badge-blue">'+es.length+'件</span></div></div>';
     h+='<div class="card-schedule">';
     const seen=new Set();
     es.forEach(e=>{
