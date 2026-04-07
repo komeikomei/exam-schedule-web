@@ -258,7 +258,7 @@ body { font-family:'Zen Kaku Gothic New','Noto Sans JP',sans-serif; background:v
 
 <div id="links" class="tab-content" style="display:none;max-width:900px;margin:0 auto;padding:0 20px">
       <div class="filter-bar">
-        <input type="text" id="linkSearch" placeholder="大学名で検索..." oninput="renderLinks()" style="flex:1;min-width:200px;padding:10px 14px;font-size:16px;border:1px solid var(--border);border-radius:8px;outline:none;box-sizing:border-box">
+        <input class="search-input" type="text" id="linkSearch" placeholder="大学名で検索..." oninput="renderLinks()" style="flex:1;min-width:200px">
         <select class="filter-select" id="linkCat" onchange="renderLinks()">
           <option value="">設置区分：すべて</option>
           <option value="国立">国立</option>
@@ -593,6 +593,10 @@ function matchBunkei(dp,bk){
   if(bk==='ri')return RI_DEPT.some(k=>d.includes(k));
   return true;
 }
+function getUniUrl(name){
+  const u=uniData.find(x=>x.n===name);
+  return u?u.u:null;
+}
 function runDiag(){
   const bk=document.getElementById('dxBunkei')?.value||'';
   const field=document.getElementById('dxField')?.value||'';
@@ -628,7 +632,7 @@ function renderDiagCards(data){
   const g={};data.forEach(d=>{const k=d.s;if(!g[k])g[k]=[];g[k].push(d)});
   let h='';
   Object.entries(g).forEach(([s,es])=>{
-    h+='<div class="school-card"><div class="card-header"><div class="card-school-name">'+s+'</div><div class="card-badges"><span class="badge badge-blue">'+es.length+'件</span></div></div>';
+    h+='<div class="school-card"><div class="card-header"><div class="card-school-name">'+s+'</div>';var uu=getUniUrl(s);if(uu)h+='<a href="'+uu+'" target="_blank" rel="noopener" style="margin-left:8px;padding:4px 10px;font-size:12px;background:var(--accent);color:#fff;border-radius:6px;text-decoration:none;white-space:nowrap">入試情報</a>';h+='<div class="card-badges"><span class="badge badge-blue">'+es.length+'件</span></div></div>';
     h+='<div class="card-schedule">';
     const seen=new Set();
     es.forEach(e=>{
