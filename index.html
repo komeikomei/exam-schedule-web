@@ -334,16 +334,14 @@ function switchTab(t,btn){
   document.querySelectorAll('.tab-content').forEach(d=>d.style.display='none');
   if(t==='links'){
     document.getElementById('links').style.display='';
-    document.getElementById('calendarView').style.display='none';
-    document.getElementById('listView').style.display='none';
-    document.getElementById('compareView').style.display='none';
-    document.getElementById('statsBar').style.display='none';
-    document.querySelectorAll('.mode-btn').forEach(b=>b.style.display='none');
-    document.querySelectorAll('.filter-bar').forEach(b=>{if(!b.closest('#links'))b.style.display='none'});
+    document.querySelector('.main').style.display='none';
+    document.querySelector('.footer').style.display='none';
     document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
     btn.classList.add('active');
     renderLinks();return;
   }
+  document.querySelector('.main').style.display='';
+  document.querySelector('.footer').style.display='';
   document.querySelectorAll('.filter-bar').forEach(b=>b.style.display='');
   document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
